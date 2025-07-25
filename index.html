@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -7,98 +8,123 @@
     <link rel="stylesheet" href="style.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Hacker Glasses Interface</title>
     <script>
-        function getLocation() {
-    const locationElement = document.getElementById('location');
-    
-    if (navigator.geolocation) {
-        locationElement.textContent = "Lade Position...";
-        
-        navigator.geolocation.getCurrentPosition(
-            // Erfolg
-            function(position) {
-                const lat = position.coords.latitude.toFixed(6);
-                const lon = position.coords.longitude.toFixed(6);
-                const accuracy = position.coords.accuracy;
-                
-                locationElement.innerHTML = `
-                    Breitengrad: ${lat}°<br>
-                    Längengrad: ${lon}°<br>
-                `;
-            },
-            // Fehler
-            function(error) {
-                let errorMsg = "";
-                switch(error.code) {
-                    case error.PERMISSION_DENIED:
-                        errorMsg = "Standortzugriff verweigert";
-                        break;
-                    case error.POSITION_UNAVAILABLE:
-                        errorMsg = "Position nicht verfügbar";
-                        break;
-                    case error.TIMEOUT:
-                        errorMsg = "Zeitüberschreitung";
-                        break;
-                    default:
-                        errorMsg = "Unbekannter Fehler";
-                        break;
-                }
-                locationElement.textContent = `Fehler: ${errorMsg}`;
-            },
-            // Optionen
-            {
-                enableHighAccuracy: true,
-                timeout: 10000,
-                maximumAge: 60000
+        let config_data = {};
+
+        function updatePageElements() {
+            let elementAllesStyle = document.getElementById("alles").style;
+            document.getElementById("user").innerHTML = "User: " + config_data.username;
+            elementAllesStyle.color = config_data.style.color;
+            if (config_data.style.border) {
+                elementAllesStyle.border = "5px dotted " + config_data.style.color;
             }
-        );
-    } else {
-        locationElement.textContent = "Geolocation wird nicht unterstützt";
-    }
-}
+            if (config_data.style.glow) {
+                elementAllesStyle.boxShadow = "0 0 40px " + config_data.style.color;
+            }
+            elementAllesStyle.opacity = config_data.style.opacity;
+            elementAllesStyle.height = config_data.style.height;
+            elementAllesStyle.width = config_data.style.width;
 
-// Automatisch beim Laden ausführen
-//window.addEventListener('load', getLocation);
-    </script>
-    
-</head>
-<body>
-    <div id="alles">
-        <div>Benutzer: WHOAMI</div>
-        <div class="break"></div>
-        <div id="time"></div>
-        <div class="break"></div>
-        <div id="date"></div>
-        <div class="break"></div>
-        <div class="flicker-animation" id="location">Kein Standortzugriff</div>
+            document.getElementsByTagName("body")[0].style.alignItems = config_data.style.alignment;
+            document.getElementsByTagName("body")[0].style.justifyContent = config_data.style.orientation;
+        }
 
-    <script>
+        function getLocation() {
+            fetch('config.json')
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    config_data = data
+                })
+                .catch(error => {
+                    console.error('Fehler:', error);
+                });
+
+            // 100ms timeout for request
+            setTimeout(updateDate, 100);
+            setInterval(updateDate, 1000);
+
+            setInterval(updateTime, 1000);
+            setTimeout(updateTime, 100);
+
+            setTimeout(updatePageElements, 100);
+            const locationElement = document.getElementById('location');
+
+            if (navigator.geolocation) {
+                locationElement.textContent = "loading location...";
+
+                navigator.geolocation.getCurrentPosition(
+                    // Erfolg
+                    function (position) {
+                        const lat = position.coords.latitude.toFixed(6);
+                        const lon = position.coords.longitude.toFixed(6);
+                        const accuracy = position.coords.accuracy;
+
+                        locationElement.innerHTML = `
+                    latitude: ${lat}°<br>
+                    longitude: ${lon}°<br>
+                `;
+                    },
+                    // Fehler
+                    function (error) {
+                        let errorMsg = "";
+                        switch (error.code) {
+                            case error.PERMISSION_DENIED:
+                                errorMsg = "location data permission denied";
+                                break;
+                            case error.POSITION_UNAVAILABLE:
+                                errorMsg = "location data unavailable";
+                                break;
+                            case error.TIMEOUT:
+                                errorMsg = "location data timeout";
+                                break;
+                            default:
+                                errorMsg = "error 418";
+                                break;
+                        }
+                        locationElement.textContent = `error: ${errorMsg}`;
+                    },
+                    // Optionen
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 60000
+                    }
+                );
+            } else {
+                locationElement.textContent = "geolocation isn't supported on your device";
+            }
+        }
+
+        function updateDate() {
+            const now = new Date();
+            document.getElementById('date').textContent = now.toLocaleDateString(config_data.date.locale, config_data.date.format);
+        }
+
         function updateTime() {
             const now = new Date();
             const hours = String(now.getHours()).padStart(2, '0');
             const minutes = String(now.getMinutes()).padStart(2, '0');
             const seconds = String(now.getSeconds()).padStart(2, '0');
-            
             document.getElementById('time').textContent = `${hours}:${minutes}:${seconds}`;
         }
-        
-        updateTime();
-        setInterval(updateTime, 1000);
-    </script>
-    <script>
-            function updateDate() {
-    const now = new Date();
-    document.getElementById('date').textContent = now.toLocaleDateString('de-DE', {
-        weekday: 'long',
-        year: 'numeric', 
-        month: 'numeric',
-        day: 'numeric'
-    });
-}
 
-updateDate();
-setInterval(updateDate, 1000);
-        </script>
+        //Automatisch beim Laden ausführen
+        window.addEventListener('load', getLocation);
+    </script>
+
+</head>
+
+<body>
+    <div id="alles">
+        <div id="user">User: WHOAMI</div>
+        <div class="break"></div>
+        <div id="time"></div>
+        <div class="break"></div>
+        <div id="date"></div>
+        <div class="break"></div>
+        <div class="flicker-animation" id="location">no location data available</div>
 </body>
+
 </html>

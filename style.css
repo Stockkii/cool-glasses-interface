@@ -1,5 +1,7 @@
 body {
     background-color: black;
+    display:flex;
+    height: 98vh;
 }
 
 .break {
@@ -10,22 +12,25 @@ body {
 #alles {
     display: flex;
     width: 1200px;
+    
+    /*
     margin-left: auto;
     margin-right: auto;
-    justify-items: center;
-    align-content: center;
+    box-shadow: 0 0 40px green;
+    border: 5px dotted rgb(0, 255, 0);
+    */
+
     background-color: black;
     color: rgb(0, 255, 0);
     font-family: "sixtyfour";
     font-size: 15px;
-    border: 5px dotted rgb(0, 255, 0);
     border-radius: 15px;
     animation: rainbow-border 3s linear infinite;
     padding: 20px;
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
     line-height: 3rem;
     animation: flicker 1s linear;
     opacity: 50%;
+    height: auto;
 }
 
 @keyframes flicker {

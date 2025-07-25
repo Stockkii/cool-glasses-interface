@@ -1,0 +1,22 @@
+{
+    "username":"WHOAMI",
+    "style": {
+        "opacity":"100%",
+        "color": "white",
+        "border": false,
+        "orientation": "left",
+        "alignment": "start",
+        "height": "auto",
+        "width": "1200px",
+        "glow":false
+    },
+    "date": {
+        "locale": "en-US",
+        "format": {
+            "weekday": "short",
+            "year": "numeric",
+            "month": "numeric",
+            "day": "numeric"
+        }
+    }
+}
